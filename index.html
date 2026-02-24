@@ -2,95 +2,85 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Alvin Manoj | Cyber Security Professional</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <nav>
-    <div class="logo">AM<span>.</span></div>
-    <ul class="nav-links">
-      <li><a href="#home">Cyber Ops</a></li>
-      <li><a href="#projects">Security Projects</a></li>
-      <li><a href="#skills">Security Skills</a></li>
-      <li><a href="#contact" class="btn-contact">Inquiry</a></li>
-    </ul>
-  </nav>
+<nav>
+  <div class="logo">AM<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#home">Security Ops</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#labs">Security Labs</a></li>
+    <li><a href="#contact" class="btn-contact">Contact</a></li>
+  </ul>
+</nav>
 
-  <header id="home">
-    <div class="hero-content">
-      <span class="badge">Cyber Security & Ethical Hacking</span>
-      <h1>Alvin Manoj</h1>
-      <p class="tagline">Cyber Security Professional</p>
-      <p class="description">
-        Specializing in cyber security operations, ethical hacking, vulnerability assessment,
-        penetration testing, threat mitigation, and secure system architecture.
-      </p>
-      <div class="hero-btns" style="margin-top: 60px;">
-        <a href="#projects" class="btn-primary">View Security Projects</a>
-      </div>
-    </div>
-  </header>
-
-  <section id="projects">
-    <h2 class="section-title">Cyber Security Projects</h2>
-    <div class="grid">
-      <div class="card reveal">
-        <h3>Vulnerability Assessment Lab</h3>
-        <p>Performed vulnerability scanning and remediation using industry security tools.</p>
-        <span class="tech-stack">Nmap • Nessus • Metasploit</span>
-      </div>
-      <div class="card reveal">
-        <h3>Web Application Penetration Testing</h3>
-        <p>Identified security flaws such as SQL Injection and XSS in test web applications.</p>
-        <span class="tech-stack">Burp Suite • OWASP • Kali Linux</span>
-      </div>
-    </div>
-  </section>
-
-  <section id="skills">
-    <h2 class="section-title">Cyber Security Skills</h2>
-    <div class="grid">
-      <div class="card reveal">
-        <h3>Ethical Hacking</h3>
-        <p>Reconnaissance, exploitation, post-exploitation, reporting.</p>
-      </div>
-      <div class="card reveal">
-        <h3>Security Operations (SOC)</h3>
-        <p>SIEM monitoring, incident response, alert triage, log analysis.</p>
-      </div>
-      <div class="card reveal">
-        <h3>Network Security</h3>
-        <p>Firewalls, IDS/IPS, VPNs, secure network segmentation.</p>
-      </div>
-      <div class="card reveal">
-        <h3>Security Tools</h3>
-        <p>Wireshark, Nmap, Burp Suite, Metasploit.</p>
-      </div>
-    </div>
-  </section>
-
-  <section id="contact">
-    <h2 class="section-title">Inquiry Form</h2>
-    <p style="text-align: center; color: var(--text-dim); margin-bottom: 2rem;">
-      Please leave your details below, and I will get back to you shortly.
+<header id="home">
+  <div class="hero-content">
+    <span class="badge">Cyber Security & Ethical Hacking</span>
+    <h1>Alvin Manoj</h1>
+    <p class="tagline">Cyber Security Professional</p>
+    <p class="description">
+      Specializing in Ethical Hacking, Application Security, Cloud Security, Digital Forensics, and Malware Analysis.
     </p>
-    <div class="contact-card">
-      <form id="visitor-form">
-        <input type="text" placeholder="Your Name" required />
-        <input type="email" placeholder="Your Professional Email" required />
-        <textarea placeholder="Purpose of Inquiry (Project, Recruitment, etc.)" rows="4"></textarea>
-        <button type="submit" class="btn-primary">Submit Details</button>
-      </form>
+    <a href="#labs" class="btn-primary">View Security Labs</a>
+  </div>
+</header>
+
+<section id="skills">
+  <h2 class="section-title">Core Skills</h2>
+  <div class="grid">
+    <div class="card reveal">Ethical Hacking</div>
+    <div class="card reveal">Application Security</div>
+    <div class="card reveal">Cloud Security</div>
+    <div class="card reveal">Digital Forensics</div>
+    <div class="card reveal">Malware Analysis</div>
+  </div>
+</section>
+
+<section id="labs">
+  <h2 class="section-title">Security Labs & Projects</h2>
+  <div class="grid">
+    <div class="card reveal">
+      <h3>Web App Pentesting</h3>
+      <p>Tested vulnerabilities using OWASP Top 10 methodology.</p>
+      <span class="tech-stack">Burp Suite • Kali Linux</span>
     </div>
-  </section>
 
-  <footer>
-    <p>© 2026 Alvin Manoj | Cyber Security Professional</p>
-  </footer>
+    <div class="card reveal">
+      <h3>Cloud Infrastructure Hardening</h3>
+      <p>Secured cloud environments with IAM, firewalls and audits.</p>
+      <span class="tech-stack">AWS • Azure</span>
+    </div>
 
-  <script src="script.js"></script>
+    <div class="card reveal">
+      <h3>Malware Static Analysis</h3>
+      <p>Analyzed malware binaries and signatures.</p>
+      <span class="tech-stack">Ghidra • PEStudio</span>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <h2 class="section-title">Contact</h2>
+  <div class="contact-card">
+    <form id="visitor-form">
+      <input type="text" placeholder="Your Name" required>
+      <input type="email" placeholder="Your Email" required>
+      <textarea placeholder="Message"></textarea>
+      <button type="submit" class="btn-primary">Send</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  © 2026 Alvin Manoj | Cyber Security Professional
+</footer>
+
+<script src="script.js"></script>
 </body>
 </html>
+
