@@ -133,6 +133,40 @@
             margin-bottom: 1rem;
             opacity: 0.5;
         }
+        
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+        
+        .btn-delete:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+        
+        .btn-clear-all {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1rem;
+        }
+        
+        .btn-clear-all:hover {
+            background: #ea580c;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -166,6 +200,7 @@
                             <th>Email</th>
                             <th>Message</th>
                             <th>Timestamp</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -175,10 +210,17 @@
                                 <td>{{ inquiry.email }}</td>
                                 <td class="message-cell" title="{{ inquiry.message }}">{{ inquiry.message }}</td>
                                 <td class="timestamp">{{ inquiry.timestamp }}</td>
+                                <td>
+                                    <button class="btn-delete" onclick="deleteInquiry({{ loop.index0 }})">Delete</button>
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn-clear-all" onclick="clearAllInquiries()">Clear All Inquiries</button>
             </div>
         {% else %}
             <div class="empty-state">
@@ -188,5 +230,59 @@
             </div>
         {% endif %}
     </div>
+
+    <script>
+        async function deleteInquiry(index) {
+            if (!confirm('Are you sure you want to delete this inquiry?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/delete-inquiry', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ index })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Inquiry deleted successfully');
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to delete'));
+                }
+            } catch (err) {
+                console.error('Delete error:', err);
+                alert('Network error - check console');
+            }
+        }
+        
+        async function clearAllInquiries() {
+            if (!confirm('Are you sure you want to delete ALL inquiries? This cannot be undone!')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/clear-all-inquiries', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('All inquiries cleared');
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to clear'));
+                }
+            } catch (err) {
+                console.error('Clear error:', err);
+                alert('Network error - check console');
+            }
+        }
+    </script>
 </body>
 </html>
