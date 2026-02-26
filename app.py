@@ -23,33 +23,55 @@ DEMO_PASSWORD = "admin123"
 # ── File Storage Config ────────────────────────────────────────
 DATA_FILE = "inquiries.json"  # Store inquiries in JSON file
 
+# In-memory backup storage for Vercel (serverless)
+IN_MEMORY_INQUIRIES = []
+
 def save_inquiry_to_file(name: str, email: str, message: str) -> bool:
-    """Save inquiry to JSON file"""
+    """Save inquiry to JSON file and in-memory storage"""
     try:
-        # Load existing data or create new list
-        if os.path.exists(DATA_FILE):
-            with open(DATA_FILE, 'r') as f:
-                data = json.load(f)
-        else:
-            data = []
-        
-        # Add new inquiry
-        data.append({
+        inquiry_data = {
             "name": name,
             "email": email,
             "message": message,
             "timestamp": datetime.now().isoformat()
-        })
+        }
         
-        # Save to file
-        with open(DATA_FILE, 'w') as f:
-            json.dump(data, f, indent=2)
+        # Always save to in-memory for serverless compatibility
+        IN_MEMORY_INQUIRIES.append(inquiry_data)
+        
+        # Try to save to file if possible (for local development)
+        try:
+            if os.path.exists(DATA_FILE):
+                with open(DATA_FILE, 'r') as f:
+                    data = json.load(f)
+            else:
+                data = []
+            
+            data.append(inquiry_data)
+            
+            with open(DATA_FILE, 'w') as f:
+                json.dump(data, f, indent=2)
+        except Exception as file_err:
+            print(f"File storage not available (serverless environment): {file_err}")
         
         print(f"Saved inquiry from {name}")
         return True
     except Exception as e:
-        print(f"File write error: {e}")
+        print(f"Storage error: {e}")
         return False
+
+def get_all_inquiries():
+    """Get all inquiries from file or in-memory storage"""
+    # Try file first
+    try:
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, 'r') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Could not read file: {e}")
+    
+    # Fall back to in-memory
+    return IN_MEMORY_INQUIRIES
 
 # ── Email config (keep if you want email + DB) ──────────────────
 SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
@@ -141,12 +163,7 @@ def report():
         return redirect("/login")
     
     try:
-        if os.path.exists(DATA_FILE):
-            with open(DATA_FILE, 'r') as f:
-                inquiries = json.load(f)
-        else:
-            inquiries = []
-        
+        inquiries = get_all_inquiries()
         return render_template("report.html", inquiries=inquiries, total=len(inquiries))
     except Exception as e:
         return f"Error loading inquiries: {str(e)}", 500
