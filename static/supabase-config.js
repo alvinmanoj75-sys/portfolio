@@ -19,11 +19,11 @@
 
 // Your Supabase Project URL
 // Format: https://your-project-name.supabase.co
-const SUPABASE_URL = 'https://your-project.supabase.co';
+const SUPABASE_URL = 'https://mgwocjsbzqztjbwgfytj.supabase.co';
 
 // Your Supabase Anon Public Key
 // Format: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-const SUPABASE_ANON_KEY = 'your-anon-key-here';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1nd29janNienF6dGpid2dmeXRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwOTg3MzcsImV4cCI6MjA4NzY3NDczN30.bidQ-wg4BhXZzeAYg0TjPXDwDsS8AFZf4ASBhrNUKOw';
 
 // Export configuration
 const supabaseConfig = {
