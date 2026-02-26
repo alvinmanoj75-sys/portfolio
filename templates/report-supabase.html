@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inquiry Reports - Portfolio</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&display=swap" rel="stylesheet">
+    
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        .report-container {
+            padding: 2rem 8%;
+            min-height: 100vh;
+            background: var(--bg);
+        }
+        
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .report-header h1 {
+            font-size: 2.5rem;
+            color: var(--text-main);
+            margin: 0;
+        }
+        
+        .report-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid #1e293b;
+            padding: 1.5rem;
+            border-radius: 12px;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .stat-card h3 {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        
+        .logout-btn, .home-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .logout-btn:hover, .home-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .table-container {
+            background: var(--card-bg);
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: rgba(14, 165, 233, 0.1);
+            border-bottom: 2px solid #1e293b;
+        }
+        
+        th {
+            padding: 1.5rem;
+            text-align: left;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        
+        td {
+            padding: 1.5rem;
+            border-bottom: 1px solid #1e293b;
+            color: var(--text-main);
+        }
+        
+        tr:hover {
+            background: rgba(14, 165, 233, 0.05);
+        }
+        
+        .message-cell {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--text-dim);
+        }
+        
+        .timestamp {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-dim);
+        }
+        
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+        
+        .btn-delete:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+        
+        .btn-delete:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+        
+        .btn-clear-all {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn-clear-all:hover {
+            background: #ea580c;
+            transform: scale(1.05);
+        }
+        
+        .btn-clear-all:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-dim);
+        }
+        
+        .loading::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">APS<span>.</span></div>
+        <div style="display: flex; gap: 2rem; align-items: center;">
+            <span style="color: var(--text-dim);">Report Dashboard</span>
+            <a href="/" class="home-btn">Home</a>
+            <a href="/login" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+
+    <div class="report-container">
+        <div class="report-header">
+            <h1>Inquiry Reports</h1>
+        </div>
+        
+        <div class="report-stats">
+            <div class="stat-card">
+                <h3>Total Inquiries</h3>
+                <div class="number" id="total-count">0</div>
+            </div>
+        </div>
+        
+        <div id="content-area">
+            <div class="loading">Loading inquiries from Supabase</div>
+        </div>
+    </div>
+
+    <!-- Supabase Configuration -->
+    <script src="/static/supabase-config.js"></script>
+    
+    <script>
+        // ════════════════════════════════════════════════════════════════
+        // SUPABASE REPORT PAGE
+        // ════════════════════════════════════════════════════════════════
+        
+        let supabaseClient = null;
+        
+        function initializeSupabase() {
+            if (!supabaseConfig.url || !supabaseConfig.anonKey) {
+                console.error('❌ Supabase credentials not configured.');
+                showError('Supabase is not configured. Please add your credentials to supabase-config.js');
+                return false;
+            }
+            
+            try {
+                supabaseClient = supabase.createClient(
+                    supabaseConfig.url,
+                    supabaseConfig.anonKey
+                );
+                console.log('✅ Supabase initialized for report');
+                return true;
+            } catch (error) {
+                console.error('❌ Failed to initialize Supabase:', error);
+                showError('Failed to initialize Supabase: ' + error.message);
+                return false;
+            }
+        }
+        
+        async function loadInquiries() {
+            try {
+                if (!supabaseClient) {
+                    showError('Supabase client not initialized');
+                    return;
+                }
+                
+                const { data, error } = await supabaseClient
+                    .from('messages')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    throw error;
+                }
+                
+                console.log('✅ Loaded inquiries:', data);
+                displayInquiries(data);
+                
+            } catch (error) {
+                console.error('Error loading inquiries:', error);
+                showError('Failed to load inquiries: ' + error.message);
+            }
+        }
+        
+        function displayInquiries(inquiries) {
+            const contentArea = document.getElementById('content-area');
+            
+            // Update total count
+            document.getElementById('total-count').textContent = inquiries.length;
+            
+            if (inquiries.length === 0) {
+                contentArea.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No inquiries yet</h3>
+                        <p>Submit your first inquiry to see it here!</p>
+                        <a href="/" class="btn-primary" style="margin-top: 2rem; display: inline-block;">Go Back</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            let tableHTML = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Message</th>
+                                <th>Submitted</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            inquiries.forEach((inquiry, index) => {
+                const date = new Date(inquiry.created_at).toLocaleString();
+                tableHTML += `
+                    <tr>
+                        <td><strong>${escapeHtml(inquiry.name)}</strong></td>
+                        <td>${escapeHtml(inquiry.email)}</td>
+                        <td class="message-cell" title="${escapeHtml(inquiry.message)}">${escapeHtml(inquiry.message)}</td>
+                        <td class="timestamp">${date}</td>
+                        <td>
+                            <button class="btn-delete" onclick="deleteInquiry(${inquiry.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+                <div style="text-align: center;">
+                    <button class="btn-clear-all" onclick="clearAllInquiries()">Clear All Inquiries</button>
+                </div>
+            `;
+            
+            contentArea.innerHTML = tableHTML;
+        }
+        
+        async function deleteInquiry(id) {
+            if (!confirm('Are you sure you want to delete this inquiry?')) {
+                return;
+            }
+            
+            try {
+                const btn = event.target;
+                btn.disabled = true;
+                btn.textContent = 'Deleting...';
+                
+                const { error } = await supabaseClient
+                    .from('messages')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                console.log('✅ Inquiry deleted');
+                alert('Inquiry deleted successfully');
+                loadInquiries(); // Reload the list
+                
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('Error: ' + error.message);
+                const btn = event.target;
+                btn.disabled = false;
+                btn.textContent = 'Delete';
+            }
+        }
+        
+        async function clearAllInquiries() {
+            if (!confirm('Are you sure you want to delete ALL inquiries? This cannot be undone!')) {
+                return;
+            }
+            
+            try {
+                const btn = event.target;
+                btn.disabled = true;
+                btn.textContent = 'Clearing...';
+                
+                const { error } = await supabaseClient
+                    .from('messages')
+                    .delete()
+                    .gt('id', 0); // Delete all rows (all ids are > 0)
+                
+                if (error) {
+                    throw error;
+                }
+                
+                console.log('✅ All inquiries cleared');
+                alert('All inquiries cleared');
+                loadInquiries(); // Reload the list
+                
+            } catch (error) {
+                console.error('Clear error:', error);
+                alert('Error: ' + error.message);
+                const btn = event.target;
+                btn.disabled = false;
+                btn.textContent = 'Clear All Inquiries';
+            }
+        }
+        
+        function showError(message) {
+            const contentArea = document.getElementById('content-area');
+            contentArea.innerHTML = `
+                <div class="empty-state" style="color: #ef4444;">
+                    <h3>⚠️ Error</h3>
+                    <p>${escapeHtml(message)}</p>
+                    <a href="/" class="btn-primary" style="margin-top: 2rem; display: inline-block;">Go Back</a>
+                </div>
+            `;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (initializeSupabase()) {
+                loadInquiries();
+            }
+        });
+    </script>
+</body>
+</html>

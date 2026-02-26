@@ -1,4 +1,36 @@
+// ════════════════════════════════════════════════════════════════
+// SUPABASE CLIENT INITIALIZATION
+// ════════════════════════════════════════════════════════════════
+
+let supabaseClient = null;
+
+function initializeSupabase() {
+    if (!supabaseConfig || !supabaseConfig.url || !supabaseConfig.anonKey) {
+        console.error('❌ Supabase credentials not configured. Please add them to supabase-config.js');
+        return false;
+    }
+    
+    try {
+        supabaseClient = supabase.createClient(
+            supabaseConfig.url,
+            supabaseConfig.anonKey
+        );
+        console.log('✅ Supabase initialized successfully');
+        return true;
+    } catch (error) {
+        console.error('❌ Failed to initialize Supabase:', error);
+        return false;
+    }
+}
+
+// ════════════════════════════════════════════════════════════════
+// FORM SUBMISSION
+// ════════════════════════════════════════════════════════════════
+
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Supabase
+    initializeSupabase();
+    
     const form = document.getElementById('visitor-form');
     if (!form) {
         console.error("Form not found! Check id='visitor-form' in HTML");
@@ -9,38 +41,58 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         console.log("Form submit clicked!");
 
-        const name = form.querySelector('input[type="text"]').value.trim();
-        const email = form.querySelector('input[type="email"]').value.trim();
-        const message = form.querySelector('textarea').value.trim();
+        const name = form.querySelector('input[name="name"]').value.trim();
+        const email = form.querySelector('input[name="email"]').value.trim();
+        const message = form.querySelector('textarea[name="message"]').value.trim();
 
         if (!name || !email || !message) {
             alert("Please fill all fields");
             return;
         }
 
+        // Disable submit button to prevent duplicate submissions
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+
         try {
-            const response = await fetch('/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, message })
-            });
-
-            const data = await response.json();
-            console.log("Server response:", data);
-
-            if (data.success) {
-                alert(data.message || "Thank you! Your inquiry is saved.");
-                form.reset();
-            } else {
-                alert("Error: " + (data.message || "Unknown error"));
+            if (!supabaseClient) {
+                throw new Error('Supabase client not initialized. Please configure your credentials.');
             }
+
+            // Insert data into Supabase messages table
+            const { data, error } = await supabaseClient
+                .from('messages')
+                .insert([
+                    {
+                        name: name,
+                        email: email,
+                        message: message
+                    }
+                ]);
+
+            if (error) {
+                console.error('Supabase insert error:', error);
+                throw new Error(error.message || 'Failed to save inquiry');
+            }
+
+            console.log('✅ Inquiry saved successfully:', data);
+            alert(`Thank you, ${name}! Your inquiry has been received and saved.`);
+            form.reset();
+
         } catch (err) {
-            console.error("Fetch error:", err);
-            alert("Network error - check console for details");
+            console.error("Error:", err);
+            alert("Error: " + (err.message || "Failed to submit form. Please try again."));
+        } finally {
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Details';
         }
     });
 
-    // Scroll Reveal Animation Logic
+    // ════════════════════════════════════════════════════════════════
+    // SCROLL REVEAL ANIMATION
+    // ════════════════════════════════════════════════════════════════
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -57,3 +109,4 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(el);
     });
 });
+
